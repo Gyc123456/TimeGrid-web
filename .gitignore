@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+
+# Local screenshots generated during UI verification
+/*-preview.png
+/preview.png
+
+# Local environment and logs
+.env
+.env.*
+!.env.example
+*.log

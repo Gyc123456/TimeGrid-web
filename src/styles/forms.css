@@ -1,0 +1,324 @@
+.el-button + .el-button {
+  margin-left: 0;
+}
+.el-button > span {
+  gap: 7px;
+}
+.el-button.is-text.icon-btn {
+  padding: 5px;
+  width: 28px;
+  height: 28px;
+}
+.project-cell > .el-button {
+  align-self: center;
+}
+.member-info .el-button.remove-member {
+  width: 22px;
+  height: 22px;
+  padding: 3px;
+}
+.search-input .el-input__wrapper {
+  background: #f8f9fb;
+}
+.search-input .el-input__inner {
+  font-size: 11px;
+}
+.month-nav .el-date-editor.month-picker {
+  width: 155px;
+  flex: none;
+}
+.month-picker .el-input__wrapper {
+  box-shadow: none;
+  background: transparent;
+  padding: 0 5px;
+}
+.month-picker .el-input__inner {
+  font-size: 12px;
+}
+.member-cell .el-date-editor.row-date {
+  width: 100%;
+  min-width: 0;
+}
+.row-date .el-input__wrapper {
+  box-shadow: none;
+  background: transparent;
+  padding: 0 3px;
+}
+.row-date .el-input__inner {
+  font-size: 10px;
+  letter-spacing: -0.4px;
+  text-align: center;
+}
+.row-date .el-input__prefix {
+  display: none;
+}
+.row-date .el-input__wrapper:hover {
+  box-shadow: 0 0 0 1px var(--el-border-color);
+}
+.row-date .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--el-color-primary);
+}
+.el-avatar.avatar {
+  background: var(--soft);
+  color: var(--ink);
+}
+.edit-dialog,
+.details-dialog {
+  max-width: calc(100vw - 32px);
+  border-radius: 12px;
+}
+.el-dialog__body {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 0 5px;
+}
+.el-dialog__header {
+  padding-bottom: 12px;
+}
+.el-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 20px;
+}
+.dialog-intro {
+  font-size: 12px;
+  color: #9499a6;
+  line-height: 1.8;
+  margin: 0 0 20px;
+}
+.el-form-item__label {
+  font-size: 12px;
+}
+.date-fields {
+  display: flex;
+  gap: 12px;
+}
+.date-fields > .el-form-item {
+  flex: 1;
+  min-width: 0;
+}
+.date-fields .el-date-editor.el-input {
+  width: 100%;
+}
+.field-hint {
+  display: block;
+  width: 100%;
+  font-size: 10px;
+  color: #9499a6;
+  line-height: 1.8;
+  margin-top: 6px;
+}
+.details-dialog .el-input-number {
+  width: 180px;
+}
+.details-dialog input[readonly] {
+  color: #8e94a2;
+}
+.attachment-upload,
+.attachment-tags {
+  width: 100%;
+}
+.attachment-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+.attachment-tags .el-tag {
+  height: auto;
+  min-height: 32px;
+  max-width: 100%;
+  justify-content: space-between;
+}
+.attachment-name {
+  min-width: 0;
+  max-width: 100%;
+  justify-content: flex-start;
+}
+.attachment-name > span {
+  min-width: 0;
+}
+.attachment-name span span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.attachment-tags small {
+  color: #9499a6;
+  white-space: nowrap;
+}
+.attachment-name svg {
+  flex-shrink: 0;
+}
+.conflict-settings .el-select {
+  width: 120px;
+}
+.preview-dialog {
+  max-width: calc(100vw - 32px);
+  border-radius: 12px;
+}
+.preview-dialog .el-dialog__body {
+  min-height: 180px;
+}
+.preview-image {
+  display: block;
+  max-width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  margin: auto;
+}
+.preview-frame {
+  width: 100%;
+  height: 65vh;
+  border: 0;
+}
+.preview-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #f7f8fb;
+  padding: 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #374151;
+  margin: 0;
+}
+.preview-video {
+  width: 100%;
+  max-height: 65vh;
+}
+.range-toolbar .el-date-editor {
+  width: 145px;
+  flex: none;
+}
+.detail-progress {
+  width: 100%;
+  min-width: 0;
+}
+.detail-progress .el-slider {
+  margin-top: 10px;
+}
+.project-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  background: var(--soft);
+  color: var(--accent);
+  overflow: hidden;
+}
+.project-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.project-icon.icon-preview {
+  width: 44px;
+  height: 44px;
+}
+.project-icon-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.project-context-menu {
+  position: fixed;
+  z-index: 4000;
+  width: 160px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #e9ebf0;
+  border-radius: 8px;
+  box-shadow: 0 8px 28px #28303f22;
+}
+.project-context-menu .el-button {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  margin: 0;
+}
+.project-icon-library {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+  margin: 14px 0 4px;
+}
+.project-icon-library .icon-choice {
+  margin: 0;
+  height: 54px;
+  padding: 5px 2px;
+  color: #8b90a0;
+  border-color: #e9ebf0;
+}
+.project-icon-library .icon-choice > span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+}
+.project-icon-library .icon-choice.chosen {
+  color: var(--accent);
+  background: var(--soft);
+  border-color: var(--accent);
+}
+.project-icon-controls {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  gap: 12px;
+  padding: 12px;
+  background: #f8f9fc;
+  border: 1px solid #eceef4;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+.project-icon-controls .project-icon-upload {
+  width: auto;
+  flex: 0 0 auto;
+}
+.project-icon-controls .icon-preview {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e9e6f0;
+}
+.project-icon-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #787e8d;
+}
+.project-icon-color .el-color-picker {
+  width: auto;
+  flex: none;
+}
+.reset-project-icon {
+  margin-top: 8px;
+  font-size: 12px;
+}
+.project-icon-library {
+  gap: 8px;
+  margin: 14px 0 8px;
+}
+.project-icon-library .icon-choice {
+  height: 58px;
+  border-radius: 8px;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.project-icon-library .icon-choice:hover {
+  color: var(--accent);
+  background: var(--soft);
+  border-color: var(--accent);
+}
