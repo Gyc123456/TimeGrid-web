@@ -1,4 +1,5 @@
-import { ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { usePageMotion } from './usePageMotion'
+import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import type { Ref } from 'vue'
 import gsap from 'gsap'
 import type { Member } from '../types/project'
@@ -29,8 +30,6 @@ export function useScheduleMotion({
 }: MotionOptions) {
   const ganttElement = ref<HTMLElement>()
   const scheduleCard = ref<HTMLElement>()
-  let pageTransition: gsap.core.Tween | undefined
-  let entrance: gsap.core.Tween | undefined
   let glow: gsap.core.Tween | undefined
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
   function animateConflicts() {
@@ -58,69 +57,37 @@ export function useScheduleMotion({
       },
     )
   }
-  function animateProjectSwitch() {
-    pageTransition?.kill()
-    const panel = scheduleCard.value
-    if (!panel) return
-    gsap.set(panel, { clearProps: 'opacity,transform' })
-    if (reducedMotion.matches) return
-    pageTransition = gsap.fromTo(
-      panel,
-      { opacity: 0.35, x: 20 },
-      { opacity: 1, x: 0, duration: 0.36, ease: 'power2.out', clearProps: 'opacity,transform' },
-    )
-  }
-  watch(() => [selectedProject.value, viewMode.value], animateProjectSwitch, { flush: 'post' })
-  async function animateView() {
-    await nextTick()
-    entrance?.kill()
-    if (ganttElement.value) {
-      const rows = ganttElement.value.querySelectorAll('.task-bar')
-      gsap.set(rows, { clearProps: 'opacity,transform' })
-      if (!reducedMotion.matches)
-        entrance = gsap.fromTo(
-          rows,
-          { opacity: 0, y: 5 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.3,
-            stagger: { each: 0.025, amount: 0.3 },
-            ease: 'power2.out',
-            clearProps: 'opacity,transform',
-          },
-        )
-    }
-    animateConflicts()
-  }
-  watch(
-    () => [
-      viewMode.value,
+  const pageKey = computed(() => `${selectedProject.value}:${viewMode.value}`)
+  const resultKey = computed(() =>
+    JSON.stringify([
       query.value,
       personFilter.value,
-      selectedProject.value,
       rangeStart.value,
       rangeEnd.value,
-      [...collapsed.value].join('|'),
-      assignments.value.map((m) => m.id).join('|'),
-    ],
-    animateView,
-    { flush: 'post' },
+      [...collapsed.value],
+      assignments.value.map((member) => member.id),
+    ]),
   )
+  usePageMotion(scheduleCard, resultKey, {
+    axis: 'x',
+    pageKey,
+    layerSelector:
+      '.card-toolbar, .view-controls, .calendar-toolbar, .range-toolbar, .gantt-scroll, .table-footer',
+    resultSelector: '.task-bar',
+  })
+  watch([pageKey, resultKey], () => nextTick(animateConflicts), { flush: 'post' })
   watch(
     () => conflictMode.value + ':' + [...conflicts.value].sort().join('|'),
     () => nextTick(animateConflicts),
     { flush: 'post' },
   )
   onMounted(() => {
-    animateView()
-    reducedMotion.addEventListener('change', animateView)
+    animateConflicts()
+    reducedMotion.addEventListener('change', animateConflicts)
   })
   onBeforeUnmount(() => {
-    pageTransition?.kill()
-    entrance?.kill()
     glow?.kill()
-    reducedMotion.removeEventListener('change', animateView)
+    reducedMotion.removeEventListener('change', animateConflicts)
   })
 
   return { ganttElement, scheduleCard }
