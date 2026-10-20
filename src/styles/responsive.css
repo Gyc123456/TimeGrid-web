@@ -102,7 +102,7 @@
     line-height: 1.8;
   }
   .eyebrow {
-    font-size: 7px;
+    font-size: 12px;
   }
   .primary {
     padding: 9px 12px;
@@ -116,7 +116,7 @@
   }
   .member-cell input[type='date'] {
     width: 102px;
-    font-size: 9px;
+    font-size: 12px;
   }
   .member-info {
     padding-left: 12px;
@@ -135,7 +135,7 @@
     display: none;
   }
   .page-footer {
-    font-size: 8px;
+    font-size: 12px;
   }
   .calendar-toolbar {
     gap: 5px;
@@ -161,14 +161,14 @@
     white-space: nowrap;
   }
   .page-heading p {
-    font-size: 11px;
+    font-size: 12px;
   }
   .stats > div {
     padding: 0 12px;
     gap: 9px;
   }
   .stats small {
-    font-size: 9px;
+    font-size: 12px;
   }
   .toolbar-right {
     width: 100%;
@@ -198,7 +198,7 @@
   }
   .member-cell input[type='date'] {
     width: 89px;
-    font-size: 9px;
+    font-size: 12px;
   }
   .table-head > span:first-child {
     padding-left: 12px;
@@ -229,7 +229,7 @@
     flex-shrink: 0;
   }
   .row-date .el-input__inner {
-    font-size: 9px;
+    font-size: 12px;
   }
   .el-dialog {
     margin-top: 20px !important;

@@ -9,8 +9,8 @@ const {
   collapsed,
   conflictMode,
   conflicts,
-  dayWidth,
-  days,
+  columnWidth,
+  columns,
   displayed,
   dragging,
   duration,
@@ -23,9 +23,14 @@ const {
   openProjectMenu,
   owner,
   query,
+  projectBarStyle,
+  rangeStart,
+  rangeEnd,
   scheduleCard,
   timelineWidth,
-  todayStr,
+  timelineViewport,
+  timelineHeading,
+  timelineScale,
   toggle,
   viewMode,
 } = useTimeGridContext()
@@ -47,25 +52,34 @@ import ScheduleToolbar from '../../components/schedule/ScheduleToolbar.vue'
       show-icon
       @close="notice = ''"
     />
-    <div class="gantt-scroll">
+    <div
+      ref="timelineViewport"
+      class="gantt-scroll"
+    >
       <div
         ref="ganttElement"
         class="gantt"
-        :style="{ '--timeline-width': timelineWidth + 'px', '--day-width': dayWidth + 'px' }"
+        :class="{ 'is-year-view': timelineScale === 'year' }"
+        :style="{ '--timeline-width': timelineWidth + 'px', '--column-width': columnWidth + 'px' }"
       >
-        <div class="table-head sticky-left">
+        <div
+          ref="timelineHeading"
+          class="table-head sticky-left"
+        >
           <span>{{ viewMode === 'projects' ? '项目 / 参与成员' : '人员 / 参与项目' }}</span
           ><span>开始日期</span><span>结束日期</span>
         </div>
         <div class="date-header">
           <div
-            v-for="d in days"
+            v-for="d in columns"
             :key="d.date"
             class="date-cell"
-            :class="{ weekend: d.weekend, today: d.date === todayStr }"
+            :class="{ weekend: d.weekend, today: d.current }"
           >
-            <span>{{ d.week }}</span
-            ><strong :title="d.date">{{ d.label }}</strong>
+            <span>{{ d.caption }}</span
+            ><strong :title="d.date === d.end ? d.date : `${d.date} 至 ${d.end}`">{{
+              d.label
+            }}</strong>
           </div>
         </div>
         <template
@@ -105,9 +119,33 @@ import ScheduleToolbar from '../../components/schedule/ScheduleToolbar.vue'
               ><Plus :size="16"
             /></ElButton>
           </div>
-          <div class="project-timeline">
-            <span>{{ bounds(p) }}</span
-            ><span>{{ p.members.length }} {{ viewMode === 'projects' ? '位成员' : '项排期' }}</span>
+          <div
+            class="project-timeline"
+            :class="{ 'year-overview': timelineScale === 'year' }"
+          >
+            <template v-if="timelineScale === 'year'">
+              <div class="grid-days">
+                <div
+                  v-for="d in columns"
+                  :key="d.date"
+                  :class="{ 'today-column': d.current }"
+                ></div>
+              </div>
+              <div
+                v-if="inView(p)"
+                class="project-cycle-bar"
+                :style="projectBarStyle(p)"
+                :title="`${p.name} · ${bounds(p)}`"
+              >
+                <span>{{ bounds(p) }}</span>
+              </div>
+            </template>
+            <template v-else>
+              <span>{{ bounds(p) }}</span
+              ><span
+                >{{ p.members.length }} {{ viewMode === 'projects' ? '位成员' : '项排期' }}</span
+              >
+            </template>
           </div>
           <template v-if="!collapsed.has(p.id)">
             <template
@@ -169,9 +207,9 @@ import ScheduleToolbar from '../../components/schedule/ScheduleToolbar.vue'
               >
                 <div class="grid-days">
                   <div
-                    v-for="d in days"
+                    v-for="d in columns"
                     :key="d.date"
-                    :class="{ weekend: d.weekend, 'today-column': d.date === todayStr }"
+                    :class="{ weekend: d.weekend, 'today-column': d.current }"
                   ></div>
                 </div>
                 <div
@@ -190,14 +228,14 @@ import ScheduleToolbar from '../../components/schedule/ScheduleToolbar.vue'
                   ]"
                   :data-member-id="m.id"
                   :style="barStyle(m)"
-                  :title="`${m.name} · ${m.start} 至 ${m.end} · ${duration(m)} 天。\n拖动移动，拖动两端调整；右键查看详情。`"
+                  :title="`${m.name} · ${m.start} 至 ${m.end} · ${duration(m)} 天。\n${timelineScale === 'year' ? '按月总览；双击或右键查看详情，日期精确到天。' : '拖动移动，拖动两端调整；右键查看详情。'}`"
                   @keydown.enter.prevent="openDetails(owner(m).id, m)"
                   @keydown.space.prevent="openDetails(owner(m).id, m)"
                   @dblclick="openDetails(owner(m).id, m)"
                   @pointerdown="begin($event, m, 'move')"
                 >
                   <span
-                    v-if="m.start >= days[0]!.date"
+                    v-if="timelineScale === 'month' && m.start >= rangeStart"
                     class="resize-handle left"
                     @pointerdown.stop="begin($event, m, 'start')"
                   ></span
@@ -206,7 +244,7 @@ import ScheduleToolbar from '../../components/schedule/ScheduleToolbar.vue'
                     }}{{ viewMode === 'projects' ? m.name : owner(m).name
                     }}<span>· {{ duration(m) }} 天</span></span
                   ><span
-                    v-if="m.end <= days.at(-1)!.date"
+                    v-if="timelineScale === 'month' && m.end <= rangeEnd"
                     class="resize-handle right"
                     @pointerdown.stop="begin($event, m, 'end')"
                   ></span>
@@ -240,8 +278,13 @@ import ScheduleToolbar from '../../components/schedule/ScheduleToolbar.vue'
       >
     </div>
     <div class="table-footer">
-      <span><span class="legend-square"></span>周末<span class="legend-line"></span>今天</span
-      ><span>每位成员一行 · 日期精确到天</span>
+      <span
+        ><template v-if="timelineScale === 'month'"
+          ><span class="legend-square"></span>周末</template
+        ><span class="legend-line"></span>{{ timelineScale === 'year' ? '本月' : '今天' }}</span
+      ><span>{{
+        timelineScale === 'year' ? '按月总览 · 详情日期精确到天' : '每位成员一行 · 日期精确到天'
+      }}</span>
     </div>
   </div>
 </template>

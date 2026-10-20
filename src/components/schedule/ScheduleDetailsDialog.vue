@@ -26,7 +26,6 @@ import {
   ElFormItem,
   ElInput,
   ElInputNumber,
-  ElProgress,
   ElSlider,
   ElTag,
   ElUpload,
@@ -99,6 +98,7 @@ import { Check, Download, Plus } from 'lucide-vue-next'
             label="工作时长（天）"
             required
             ><ElInputNumber
+              class="duration-input"
               :model-value="detail.days"
               :min="1"
               :max="36500"
@@ -110,26 +110,22 @@ import { Check, Download, Plus } from 'lucide-vue-next'
             /><small class="field-hint">按自然日计算，包含开始及结束当天。</small></ElFormItem
           >
           <ElFormItem label="开发进度">
-            <div class="detail-progress">
-              <ElProgress
-                :percentage="detail.progress"
-                :status="
-                  detailStatus === '已完成'
-                    ? 'success'
-                    : detailStatus === '滞后'
-                      ? 'exception'
-                      : undefined
-                "
-                :stroke-width="10"
-              />
+            <div
+              class="detail-progress"
+              :class="{
+                'is-complete': detailStatus === '已完成',
+                'is-late': detailStatus === '滞后',
+              }"
+            >
               <ElSlider
                 v-model="detail.progress"
                 :min="0"
                 :max="100"
                 :step="1"
-                show-input
+                :format-tooltip="(value: number) => `${value}%`"
                 aria-label="开发进度"
               />
+              <span class="detail-progress-value">{{ detail.progress }}%</span>
             </div>
           </ElFormItem>
           <ElFormItem label="完成情况"

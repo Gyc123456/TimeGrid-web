@@ -18,6 +18,9 @@
 body {
   margin: 0;
 }
+small {
+  font-size: 12px;
+}
 button,
 input,
 select {
@@ -75,7 +78,7 @@ h1 {
   border-radius: 6px;
   background: white;
   padding: 8px 13px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .purple {
   --accent: #8c76d6;
@@ -109,7 +112,7 @@ h1 {
   border-radius: 50%;
   background: var(--soft);
   color: var(--ink);
-  font-size: 11px;
+  font-size: 12px;
   flex-shrink: 0;
 }
 .avatar.dark {

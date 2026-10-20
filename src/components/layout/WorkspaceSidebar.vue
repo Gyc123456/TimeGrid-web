@@ -20,7 +20,9 @@ import { projectIcon, projectStyle } from '../../config/projectAppearance'
       text
       class="nav-item active"
       @click="showAllProjects"
-      ><CalendarDays :size="18" />项目排期<span>{{ projects.length }}</span></ElButton
+      ><CalendarDays :size="18" />项目排期<span class="nav-count">{{
+        projects.length
+      }}</span></ElButton
     >
     <div class="sidebar-projects">
       <div class="nav-label">

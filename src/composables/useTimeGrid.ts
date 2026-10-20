@@ -4,26 +4,26 @@ import { computed, ref, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { Member, Project } from '../types/project'
 import type { ConflictMode } from '../utils/schedule'
+import { checkChange, conflictIds, daysBetween, iso, stamp, validRange } from '../utils/schedule'
 import {
-  checkChange,
-  conflictIds,
-  DAY,
-  daysBetween,
-  iso,
-  stamp,
-  timelineDates,
-  validRange,
-} from '../utils/schedule'
+  calendarRange,
+  fitTimelineColumnWidth,
+  timelineColumns,
+  timelineSpan,
+} from '../utils/timeline'
+import type { TimelineScale } from '../utils/timeline'
 import { projectStyle } from '../config/projectAppearance'
 import { createSeedProjects } from '../data/seedProjects'
 import { useScheduleDrag } from './useScheduleDrag'
 import { useScheduleMotion } from './useScheduleMotion'
+import { useTimelineViewport } from './useTimelineViewport'
 import { useAttachmentPreview } from './useAttachmentPreview'
 
 export function useTimeGrid() {
   const today = new Date()
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
   const month = ref(todayStr.slice(0, 7))
+  const timelineScale = ref<TimelineScale>('month')
   const rangeStart = ref(month.value + '-01')
   const rangeEnd = ref(iso(Date.UTC(today.getFullYear(), today.getMonth() + 1, 0)))
   const seed = createSeedProjects(today)
@@ -159,6 +159,7 @@ export function useTimeGrid() {
     return projects.value.find((p) => p.members.some((row) => row.id === m.id))!
   }
   function fitProjectRange() {
+    if (timelineScale.value === 'year') return
     const list = selectedProject.value
       ? projects.value.filter((p) => p.id === selectedProject.value)
       : projects.value
@@ -208,18 +209,11 @@ export function useTimeGrid() {
     return result
   }
   const timelineStart = computed(() => stamp(rangeStart.value))
-  const days = computed(() =>
-    timelineDates(rangeStart.value, rangeEnd.value).map((date, i) => {
-      const d = new Date(stamp(date))
-      const n = d.getUTCDate()
-      return {
-        date,
-        n,
-        label: i === 0 || n === 1 ? `${d.getUTCMonth() + 1}/${n}` : String(n),
-        week: ['日', '一', '二', '三', '四', '五', '六'][d.getUTCDay()],
-        weekend: [0, 6].includes(d.getUTCDay()),
-      }
-    }),
+  const columns = computed(() =>
+    timelineColumns(rangeStart.value, rangeEnd.value, timelineScale.value).map((column) => ({
+      ...column,
+      current: column.date <= todayStr && column.end >= todayStr,
+    })),
   )
   function setRange(start: string, end: string) {
     if (!validRange(start, end)) {
@@ -236,14 +230,41 @@ export function useTimeGrid() {
     month.value = start.slice(0, 7)
   }
   function setMonth(value: string) {
-    if (!/^\d{4}-\d{2}$/.test(value)) return
-    const first = value + '-01'
-    const d = new Date(stamp(first))
-    setRange(first, iso(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)))
+    const range = calendarRange(value, 'month')
+    if (range) setRange(range.start, range.end)
+  }
+  function setYear(value: string) {
+    const range = calendarRange(value, 'year')
+    if (!range) return
+    const focusedMonth = month.value.slice(5, 7)
+    setRange(range.start, range.end)
+    month.value = `${value}-${focusedMonth}`
+  }
+  function setTimelineScale(value: unknown) {
+    if (value !== 'month' && value !== 'year') return
+    if (value === timelineScale.value) return
+    cancelDrag()
+    timelineScale.value = value
+    if (value === 'year') setYear(month.value.slice(0, 4))
+    else setMonth(month.value)
+  }
+  function goToToday() {
+    month.value = todayStr.slice(0, 7)
+    if (timelineScale.value === 'year') setYear(todayStr.slice(0, 4))
+    else setMonth(todayStr.slice(0, 7))
   }
 
   const dayWidth = ref(44)
-  const timelineWidth = computed(() => days.value.length * dayWidth.value)
+  const { timelineViewport, timelineHeading, availableTimelineWidth } = useTimelineViewport()
+  const columnWidth = computed(() =>
+    fitTimelineColumnWidth(
+      availableTimelineWidth.value,
+      columns.value.length,
+      timelineScale.value === 'year' ? 60 : dayWidth.value,
+    ),
+  )
+  const timelineWidth = computed(() => columns.value.length * columnWidth.value)
+  const rangeDayCount = computed(() => daysBetween(rangeStart.value, rangeEnd.value))
   const totalPeople = computed(
     () => new Set(projects.value.flatMap((p) => p.members.map((m) => m.name))).size,
   )
@@ -256,9 +277,14 @@ export function useTimeGrid() {
   function duration(m: Member) {
     return daysBetween(m.start, m.end)
   }
-  function shiftMonth(delta: number) {
+  function shiftPeriod(delta: number) {
+    if (timelineScale.value === 'year') {
+      setYear(String(Number(month.value.slice(0, 4)) + delta).padStart(4, '0'))
+      return
+    }
     const d = new Date(timelineStart.value)
-    setMonth(iso(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + delta, 1)).slice(0, 7))
+    d.setUTCMonth(d.getUTCMonth() + delta, 1)
+    setMonth(iso(d.getTime()).slice(0, 7))
   }
   function toggle(id: string) {
     const s = new Set(collapsed.value)
@@ -272,27 +298,46 @@ export function useTimeGrid() {
   function bounds(p: Project) {
     return `${p.start} — ${p.end}`
   }
-  function barStyle(m: Member) {
-    const first = Math.max(0, (stamp(m.start) - timelineStart.value) / DAY)
-    const last = Math.min(days.value.length, (stamp(m.end) - timelineStart.value) / DAY + 1)
+  function periodStyle(start: string, end: string) {
+    const span = timelineSpan(start, end, columns.value, columnWidth.value)
+    if (!span) return { display: 'none' }
+    const inset = Math.min(timelineScale.value === 'year' ? 1 : 4, span.width / 4)
     return {
-      ...projectStyle(owner(m)),
-      left: `${first * dayWidth.value + 4}px`,
-      width: `${Math.max(0, (last - first) * dayWidth.value - 8)}px`,
+      left: `${span.left + inset}px`,
+      width: `${Math.max(1, span.width - inset * 2)}px`,
     }
   }
-  function inView(m: Member) {
+  function barStyle(m: Member) {
+    return {
+      ...projectStyle(owner(m)),
+      ...periodStyle(m.start, m.end),
+    }
+  }
+  function projectBarStyle(p: Project) {
+    return { ...projectStyle(p), ...periodStyle(p.start!, p.end!) }
+  }
+  function inView(period: { start?: string; end?: string }) {
     return (
-      stamp(m.end) >= timelineStart.value &&
-      stamp(m.start) < timelineStart.value + days.value.length * DAY
+      !!period.start &&
+      !!period.end &&
+      period.end >= rangeStart.value &&
+      period.start <= rangeEnd.value
     )
   }
-  const { dragging, begin, finish, cancelDrag } = useScheduleDrag({
-    dayWidth,
+  const {
+    dragging,
+    begin: beginDrag,
+    finish,
+    cancelDrag,
+  } = useScheduleDrag({
+    dayWidth: columnWidth,
     conflictMode,
     checkCandidate,
     persistProjects,
   })
+  function begin(event: PointerEvent, member: Member, mode: 'move' | 'start' | 'end') {
+    if (timelineScale.value === 'month') beginDrag(event, member, mode)
+  }
   function editDate(m: Member, key: 'start' | 'end', value: string | null) {
     if (!value || !validRange(key === 'start' ? value : m.start, key === 'end' ? value : m.end)) {
       notice.value = '结束日期不能早于开始日期。'
@@ -353,6 +398,7 @@ export function useTimeGrid() {
     conflicts,
     selectedProject,
     viewMode,
+    timelineScale,
     query,
     personFilter,
     rangeStart,
@@ -384,8 +430,9 @@ export function useTimeGrid() {
     collapsed,
     conflictMode,
     conflicts,
+    columns,
+    columnWidth,
     dayWidth,
-    days,
     deleteProject,
     detail,
     detailError,
@@ -401,6 +448,7 @@ export function useTimeGrid() {
     exportData,
     form,
     ganttElement,
+    goToToday,
     iconLoading,
     inView,
     modal,
@@ -414,9 +462,11 @@ export function useTimeGrid() {
     personFilter,
     previewAttachment,
     projectMenu,
+    projectBarStyle,
     projects,
     query,
     rangeEnd,
+    rangeDayCount,
     rangeStart,
     readingFiles,
     save,
@@ -426,13 +476,18 @@ export function useTimeGrid() {
     selected,
     selectedProject,
     setMonth,
+    setYear,
+    setTimelineScale,
     setRange,
-    shiftMonth,
+    shiftPeriod,
     showAllProjects,
     sidebar,
     syncDates,
     syncDuration,
     timelineWidth,
+    timelineViewport,
+    timelineHeading,
+    timelineScale,
     today,
     todayStr,
     toggle,

@@ -4,7 +4,7 @@ import type { Member } from '../types/project'
 import { iso, stamp } from '../utils/schedule'
 import type { ConflictMode, checkChange } from '../utils/schedule'
 interface DragOptions {
-  dayWidth: Ref<number>
+  dayWidth: Readonly<Ref<number>>
   conflictMode: Ref<ConflictMode>
   checkCandidate: (candidate: Member, notify?: boolean) => ReturnType<typeof checkChange>
   persistProjects: () => void

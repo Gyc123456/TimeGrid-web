@@ -29,7 +29,7 @@
 }
 .view-title > span {
   margin-left: 6px;
-  font-size: 10px;
+  font-size: 12px;
   color: #a0a4b0;
   background: #f5f6f9;
   border-radius: 4px;
@@ -55,7 +55,7 @@
   background: none;
   border: 0;
   width: 150px;
-  font-size: 11px;
+  font-size: 12px;
   outline: none;
 }
 .search input::placeholder {
@@ -98,7 +98,7 @@
 .today-btn {
   border: 1px solid #e6e8ef;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 12px;
   padding: 4px 9px;
   margin-left: 9px;
 }
@@ -111,14 +111,14 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 10px;
+  font-size: 12px;
   color: #a2a6b1;
 }
 .calendar-actions select {
   border: 1px solid #e5e7ee;
   border-radius: 5px;
   background: white;
-  font-size: 10px;
+  font-size: 12px;
   padding: 6px 8px;
   color: #727988;
 }
@@ -145,7 +145,7 @@
   align-items: center;
   height: 65px;
   background: #fafbfe;
-  font-size: 10px;
+  font-size: 12px;
   color: #969ca9;
   border-bottom: 1px solid #e8eaf1;
   top: 0;
@@ -167,7 +167,7 @@
   border-bottom: 1px solid #e8eaf1;
 }
 .date-cell {
-  width: var(--day-width);
+  width: var(--column-width);
   flex-shrink: 0;
   text-align: center;
   padding-top: 11px;
@@ -175,12 +175,12 @@
 }
 .date-cell > span {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
   color: #a6acb9;
   margin-bottom: 7px;
 }
 .date-cell strong {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   display: inline-flex;
   justify-content: center;
@@ -198,6 +198,38 @@
 }
 .date-cell.today > span {
   color: #8973d0;
+}
+.gantt.is-year-view .date-cell strong {
+  width: auto;
+  min-width: 40px;
+  padding-inline: 6px;
+}
+.gantt.is-year-view .task-bar {
+  cursor: pointer;
+  touch-action: auto;
+}
+.project-timeline.year-overview {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+}
+.project-cycle-bar {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  height: 28px;
+  border: 1px solid var(--accent);
+  border-radius: 5px;
+  background: var(--bar);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 26px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.project-cycle-bar > span {
+  padding-inline: 8px;
 }
 .project-cell {
   display: flex;
@@ -236,12 +268,12 @@
   height: 25px;
   border: 1px solid color-mix(in srgb, var(--accent) 14%, transparent);
   border-radius: 6px;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 500;
 }
 .count {
   color: #a3a8b4;
-  font-size: 9px;
+  font-size: 12px;
   margin-left: 3px;
 }
 .project-cell > .icon-btn {
@@ -255,7 +287,7 @@
   gap: 17px;
   padding: 0 17px;
   color: #b0b5c0;
-  font-size: 9px;
+  font-size: 12px;
   border-bottom: 1px solid #e9ecf3;
 }
 .member-cell {
@@ -275,13 +307,13 @@
 }
 .member-info strong {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
 }
 .member-info small {
   display: block;
   color: #a7acb7;
-  font-size: 9px;
+  font-size: 12px;
   margin-top: 4px;
   max-width: 100px;
   white-space: nowrap;
@@ -300,7 +332,7 @@
 }
 .member-cell input[type='date'] {
   width: 108px;
-  font-size: 10px;
+  font-size: 12px;
   border: 1px solid transparent;
   color: #939bac;
   padding: 5px 1px;
@@ -331,7 +363,7 @@
   pointer-events: none;
 }
 .grid-days > div {
-  width: var(--day-width);
+  width: var(--column-width);
   border-right: 1px solid #f0f2f6;
   flex-shrink: 0;
 }
@@ -376,7 +408,7 @@
 }
 .bar-label {
   padding: 0 13px;
-  font-size: 10px;
+  font-size: 12px;
   white-space: nowrap;
   pointer-events: none;
   overflow: hidden;
@@ -385,7 +417,7 @@
 .bar-label > span {
   opacity: 0.75;
   margin-left: 7px;
-  font-size: 9px;
+  font-size: 12px;
 }
 .resize-handle {
   position: absolute;
@@ -419,7 +451,7 @@
   padding-left: 31px;
 }
 .add-member button {
-  font-size: 10px;
+  font-size: 12px;
   color: #a0a5b1;
   gap: 7px;
 }
@@ -433,7 +465,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  font-size: 9px;
+  font-size: 12px;
   color: #a5aab5;
   border-top: 1px solid #eceef4;
 }
@@ -460,7 +492,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 12px;
 }
 .empty-state {
   padding: 50px;
@@ -508,13 +540,32 @@ main {
 }
 .view-controls .person-select {
   width: 135px;
+  flex-shrink: 0;
+}
+.person-select .el-select__input-wrapper {
+  min-width: 0;
+}
+.person-select .el-select__input:focus-visible {
+  /* Element Plus draws the focus indicator on the select wrapper. */
+  outline: none;
+}
+.person-select-dropdown .el-select-dropdown__item {
+  height: 32px;
+  margin: 0 4px;
+  padding: 0 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 32px;
+}
+.person-select-dropdown .el-select-dropdown__item.is-selected {
+  background: var(--el-color-primary-light-9);
 }
 .conflict-settings {
   margin-left: auto;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 11px;
+  font-size: 12px;
   color: #9398a4;
 }
 .task-bar.has-conflict {
@@ -536,17 +587,17 @@ main {
   padding: 10px 20px;
   border-bottom: 1px solid #eceef4;
   color: #8e95a3;
-  font-size: 11px;
+  font-size: 12px;
 }
 .range-summary {
   margin-left: auto;
-  font-size: 10px;
+  font-size: 12px;
 }
 .date-cell strong {
   min-width: 23px;
   width: auto;
   padding: 0 2px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .task-bar.has-conflict.blocked-conflict {
   border-color: #ef4444;

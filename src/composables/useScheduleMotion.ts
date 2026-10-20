@@ -4,11 +4,13 @@ import type { Ref } from 'vue'
 import gsap from 'gsap'
 import type { Member } from '../types/project'
 import type { ConflictMode } from '../utils/schedule'
+import type { TimelineScale } from '../utils/timeline'
 interface MotionOptions {
   conflictMode: Ref<ConflictMode>
   conflicts: Ref<Set<string>>
   selectedProject: Ref<string>
   viewMode: Ref<'projects' | 'people'>
+  timelineScale: Ref<TimelineScale>
   query: Ref<string>
   personFilter: Ref<string>
   rangeStart: Ref<string>
@@ -21,6 +23,7 @@ export function useScheduleMotion({
   conflicts,
   selectedProject,
   viewMode,
+  timelineScale,
   query,
   personFilter,
   rangeStart,
@@ -57,7 +60,9 @@ export function useScheduleMotion({
       },
     )
   }
-  const pageKey = computed(() => `${selectedProject.value}:${viewMode.value}`)
+  const pageKey = computed(
+    () => `${selectedProject.value}:${viewMode.value}:${timelineScale.value}`,
+  )
   const resultKey = computed(() =>
     JSON.stringify([
       query.value,
